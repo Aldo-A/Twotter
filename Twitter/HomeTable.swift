@@ -15,9 +15,16 @@ class HomeTable: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadTweet()
+        //loadTweet()
         refresh.addTarget(self, action: #selector(loadTweet), for: .valueChanged)
         tableView.refreshControl=refresh
+        self.tableView.rowHeight=UITableView.automaticDimension
+        self.tableView.estimatedRowHeight=150
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweet()
     }
     
     @objc func loadTweet(){
@@ -76,12 +83,17 @@ class HomeTable: UITableViewController {
         let cell=tableView.dequeueReusableCell(withIdentifier: "tweetCell",for: indexPath) as! TweetCell
         let user=tweetArray[indexPath.row]["user"] as! NSDictionary
         cell.userLabel.text=user["name"] as? String
+        cell.handle.text=user["screen_name"] as? String
         cell.tweetContent.text=tweetArray[indexPath.row]["text"] as? String
         let imageURL=URL(string: (user["profile_image_url_https"] as? String)!)
         let data=try? Data(contentsOf: imageURL!)
         if let imageData=data{
             cell.picView.image=UIImage (data: imageData)
         }
+        
+        cell.favoritedTweet(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId=tweetArray[indexPath.row]["id"] as! Int
+        cell.setreTweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
         return cell
     }
     
